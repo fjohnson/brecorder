@@ -1,0 +1,43 @@
+h4 {
+  margin-top: 25px;
+}
+
+.row .row {
+  margin-top: 10px;
+  margin-bottom: 0;
+}
+
+[class*="col-"] {
+  padding-top: 15px;
+  padding-bottom: 15px;
+  border: 1px solid #ddd;
+  border: 1px solid rgba(86,61,124,.2);
+}
+
+
+hr {
+  margin-top: 40px;
+  margin-bottom: 40px;
+}
+
+.header {
+  margin-top: 20px;
+}
+
+.header [class*="col-"] {
+  background-color: #eef;
+}
+
+.data [class*="col-"] {
+  background-color: #eee;
+}
+
+.temperature {
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+
+body { padding-top: 70px; }
+
+input[type=text]
+{border:0;}
