@@ -5,13 +5,13 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>Hogworts 4.3% - Black IPA</title>
+    <title>{{ beer.name }} {{ beer.abv }} - {{ beer.style }}</title>
 
     <!-- Bootstrap -->
-    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom styles for this template -->
-    <link href="bootstrap/css/grid.css" rel="stylesheet">
+    <link href="../static/bootstrap/css/grid.css" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -25,14 +25,15 @@
 
   <nav class="navbar-fixed-top">
       <ul class="nav nav-tabs">
-          <li role="presentation" class="active"><a href="#">Home</a></li>
-          <li role="presentation"><a href="#" id="editButton">Edit</a></li>
+          <li role="presentation"><a href="/">Home</a></li>
+          <li role="presentation" class="active"><a href="" id="save_link">Save</a></li>
           <li role="presentation"><a href="#">Messages</a></li>
       </ul>
   </nav>
 
   <div class="container">
 
+  <form role="form" id="save_form" action="" method="post">
       <div class="header row">
           <div class="col-md-1">Name</div>
           <div class="col-md-1">Style</div>
@@ -50,21 +51,18 @@
       </div>
 
       <div class="data row">
-          <form role="form">
-
-          <div class="col-md-1"><input type="text" class="form-control" value="Hogworts"></div>
-          <div class="col-md-1"><input type="text" class="form-control" value="Black IPA"></div>
-          <div class="col-md-1">1.033</div>
-          <div class="col-md-1">1.01</div>
-          <div class="col-md-1">70%</div>
-          <div class="col-md-1">11.1</div>
-          <div class="col-md-1">33</div>
-          <div class="col-md-1">4.3%</div>
-          <div class="col-md-1">60 minutes</div>
-          <div class="col-md-1"><input type="text" class="form-control" value="2 Gen WLP002"></div>
-          <div class="col-md-1">2.5G</div>
-          <div class="col-md-1">Aug 9, 2015</div>
-</form>
+              <div class="col-md-1"><input type="text" class="form-control" name="name" value="{{ beer.name }}"></div>
+              <div class="col-md-1"><input type="text" class="form-control" name="style" value="{{ beer.style }}"></div>
+              <div class="col-md-1"><input type="text" class="form-control" name="og" value="{{ beer.og }}"></div>
+              <div class="col-md-1"><input type="text" class="form-control" name="fg" value="{{ beer.fg }}"></div>
+              <div class="col-md-1"><input type="text" class="form-control" name="efficiency" value="{{ beer.efficiency }}"></div>
+              <div class="col-md-1"><input type="text" class="form-control" name="srm" value="{{ beer.srm }}"></div>
+              <div class="col-md-1"><input type="text" class="form-control" name="ibus" value="{{ beer.ibus }}"></div>
+              <div class="col-md-1"><input type="text" class="form-control" name="abv" value="{{ beer.abv }}"></div>
+              <div class="col-md-1"><input type="text" class="form-control" name="boil_time" value="{{ beer.boil_time }}"></div>
+              <div class="col-md-1"><input type="text" class="form-control" name="yeast" value="{{ beer.yeast }}"></div>
+              <div class="col-md-1"><input type="text" class="form-control" name="batch_size" value="{{ beer.batch_size }}"></div>
+              <div class="col-md-1"><input type="text" class="form-control" name="date" value="{{ beer.date.strftime('%x') }}"></div>
       </div>
 
       <div class="header row">
@@ -74,9 +72,9 @@
       </div>
 
       <div class="data row">
-          <div class="col-md-1 temperature"><h6>158F</h6></div>
-          <div class="col-md-1 temperature"><h6>60 min</h6></div>
-          <div class="col-md-1 temperature"><h6>18C</h6></div>
+          <div class="col-md-1 temperature"><h6><input type="text" class="form-control" name="mash_temperature" value="{{ beer.mash_temperature }}"></h6></div>
+          <div class="col-md-1 temperature"><h6><input type="text" class="form-control" name="mash_time" value="{{ beer.mash_time }}"></h6></div>
+          <div class="col-md-1 temperature"><h6><input type="text" class="form-control" name="fermentation_temperature" value="{{ beer.fermentation_temperature }}"></h6></div>
       </div>
 
       <div class="header row">
@@ -86,53 +84,42 @@
           <div class="col-md-3">Type</div>
       </div>
 
-      <div class="data row">
-          <div class="col-md-3">Fuggles</div>
-          <div class="col-md-3">.25</div>
-          <div class="col-md-3">60</div>
-          <div class="col-md-3">Boil</div>
-      </div>
+      {% for hop in beer.hops|sort(attribute='time') %}
+          <div class="data row">
+              <div class="col-md-3"><input type="text" class="form-control" name="hop" value="{{ hop.name }}"></div>
+              <div class="col-md-3"><input type="text" class="form-control" name="hop" value="{{ hop.oz }}"></div>
+              <div class="col-md-3"><input type="text" class="form-control" name="hop" value="{{ hop.time }}"></div>
+              <div class="col-md-3 non_editable_column">
+                  <select form="save_form" name="hop">
+                      <option value="Boil" {% if hop.type == 'Boil' %} selected {% endif %}>Boil</option>
+                      <option value="Dryhop" {% if hop.type == 'Dryhop' %} selected {% endif %}>Dryhop</option>
+                      <option value="FWH" {% if hop.type == 'FWH' %} selected {% endif %}>FWH</option>
+                      <option value="Flame Out" {% if hop.type == 'Flame Out' %} selected {% endif %}>Flame Out</option>
+                  </select>
+              </div>
+          </div>
+      {% endfor %}
 
-      <div class="data row">
-          <div class="col-md-3">CTZ</div>
-          <div class="col-md-3">1</div>
-          <div class="col-md-3">0</div>
-          <div class="col-md-3">Flame Out</div>
-      </div>
 
 
       <div class="header row">
           <div class="col-md-4">Fermentables</div>
-          <div class="col-md-2">Lbs (7.5lbs)</div>
+          <div class="col-md-2">Lbs ({{ fermentables['total'] }} lbs)</div>
           <div class="col-md-2">Percent</div>
           <div class="col-md-4">Note</div>
       </div>
 
-      <div class="data row">
-          <div class="col-md-4">Maris Otter</div>
-          <div class="col-md-2">3</div>
-          <div class="col-md-2">25%</div>
-      </div>
+      {% for fermentable in fermentables['items'] %}
 
-      <div class="data row">
-          <div class="col-md-4">Munich</div>
-          <div class="col-md-2">3</div>
-          <div class="col-md-2">25%</div>
-      </div>
+          <div class="data row">
+              <div class="col-md-4"><input type="text" class="form-control" name="fermentable" value="{{ fermentable[1].name }}"></div>
+              <div class="col-md-2"><input type="text" class="form-control" name="fermentable" value="{{ fermentable[1].lbs }}"></div>
+              <div class="col-md-2 non_editable_column">{{ fermentable[0] }}</div>
+              <div class="col-md-4"><input type="text" class="form-control" name="fermentable" value="{{ fermentable[1].note }}"></div>
+          </div>
 
-      <div class="data row">
-          <div class="col-md-4">Fruit Puree</div>
-          <div class="col-md-2">1</div>
-          <div class="col-md-2">10%</div>
-          <div class="col-md-4"><input type="text" class="form-control" value="Added to secondary for 3 weeks @ 18C"></div>
-      </div>
+      {% endfor %}
 
-      <div class="data row">
-          <div class="col-md-4">Brown Sugar</div>
-          <div class="col-md-2">.5</div>
-          <div class="col-md-2">5%</div>
-          <div class="col-md-4">Added @ day 6 in primary</div>
-      </div>
 
       <div class="header row">
           <div class="col-md-4">Other Ingredient</div>
@@ -140,22 +127,27 @@
           <div class="col-md-4">Note</div>
       </div>
 
-      <div class="data row">
-          <div class="col-md-4">Oak Chips</div>
-          <div class="col-md-4">2</div>
-          <div class="col-md-4">Done @ day 6 in primary then removed 2 weeks later.</div>
-      </div>
+      {% for other_ingredient in beer.other_ingredients %}
 
-      <div class="data row">
-          <div class="col-md-4">Whirlfloc</div>
-          <div class="col-md-4">1 Tab</div>
-          <div class="col-md-4">Flame out</div>
-      </div>
+          <div class="data row">
+              <div class="col-md-4"><input type="text" class="form-control" name="oingredient" value="{{ other_ingredient.name }}"></div>
+              <div class="col-md-4"><input type="text" class="form-control" name="oingredient" value="{{ other_ingredient.amount }}"></div>
+              <div class="col-md-4"><input type="text" class="form-control" name="oingredient" value="{{ other_ingredient.note }}"></div>
+          </div>
 
-      <div class="data row">
-          <div class="col-md-4">Yeast Nutrient</div>
-          <div class="col-md-4">2.5 Grams</div>
-          <div class="col-md-4">Flame out</div>
+      {% endfor %}
+
+      <div class="row">
+          <div class="col-md-1">
+              <button type="button" class="btn btn-default btn-lg">
+                  <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+              </button>
+          </div>
+          <div class="col-md-1">
+              <button type="button" class="btn btn-default btn-lg">
+                  <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+              </button>
+          </div>
       </div>
 
       <div class="header row">
@@ -163,110 +155,77 @@
           <div class="col-md-4">Date</div>
       </div>
 
-      <div class="data row">
-          <div class="col-md-8">This beer was aged in secondary for a total of 2 weeks at 5C after a 2 week primary.
-              It has finished quite quite clear and bronze in color. Light hop taste with hints of sweetness from the
-              fruit.
-              Brown sugar no different than normal cane sugar.
-          </div>
-          <div class="col-md-4">Aug 8th, 2015</div>
-      </div>
+      {% for note in beer.notes|sort(attribute='date') %}
 
-      <div class="data row">
-          <div class="col-md-8">Now even more mellow in flavour, and despite 1oz of CTZ at flame out, no hop character
-              is descernable. Also, oak flavouring is only barely detectable.
+          <div class="data row">
+              <div class="col-md-8"><textarea name="notes" rows="5" class="form-control">{{ note.text }}</textarea></div>
+              <div class="col-md-4"><input type="text" class="form-control" name="notes" value="{{ note.date.strftime('%x') }}"></div>
           </div>
-          <div class="col-md-4">September 9th, 2015</div>
-      </div>
+
+      {% endfor %}
 
       <!-- Images -->
       <div class="header row">
           <div class="col-md-12">Images</div>
       </div>
 
-      <div class="row">
-          <div class="col-md-2">
-              <div class="thumbnail">
-                  <a href="beer.jpg">
-                      <img src="beer.jpg">
-                  </a>
+      {% if beer.images %}
+          <div class="row">
+          {% for image in beer.images %}
 
-                  <div class="caption">
-                      <h3>Beer Pix</h3>
+                  <div class="col-md-2">
+                      <div class="thumbnail">
+                          <a href="{{ image.path }}">
+                              <img src="{{ image.path }}">
+                          </a>
 
-                      <p>Here we have beer</p>
+                          <div class="caption">
+                              <p>{{ image.note }}</p>
+                          </div>
+                      </div>
                   </div>
-              </div>
+          {% endfor %}
           </div>
-          <div class="col-md-2">
-              <div class="thumbnail">
-                  <a href="beer.jpg">
-                      <img src="beer.jpg">
-                  </a>
+      {% endif %}
 
-                  <div class="caption">
-                      <h3>Beer Pix</h3>
-
-                      <p>Here we have beer</p>
-                  </div>
-              </div>
-          </div>
-      </div>
 
       <!-- Video -->
       <div class="header row">
           <div class="col-md-12">Videos</div>
       </div>
-      <div class="row">
-          <div class="col-md-6">
-              <div class="thumbnail">
-                  <div class="embed-responsive embed-responsive-16by9">
-                      <video class="embed-responsive-item" controls>
-                          <source src="foo.mp4" type="video/mp4">
-                      </video>
-                  </div>
-                  <div class="caption">
-                      <h3>A hoy hoy</h3>
 
-                      <p>infoz</p>
-                  </div>
+      {% if not beer.videos %}
 
+          <div class="row">
+          {% for video in beer.videos %}
+              <div class="col-md-6">
+                  <div class="thumbnail">
+                      <div class="embed-responsive embed-responsive-16by9">
+                          <video class="embed-responsive-item" controls>
+                              <source src="{{ video.path }}" type="video/mp4">
+                          </video>
+                      </div>
+                      <div class="caption">
+                          <p>{{ video.note }}</p>
+                      </div>
+
+                  </div>
               </div>
+          {% endfor %}
           </div>
-          <div class="col-md-6">
-              <div class="thumbnail">
-                  <div class="embed-responsive embed-responsive-16by9">
-                      <video class="embed-responsive-item" controls>
-                          <source src="foo.mp4" type="video/mp4">
-                      </video>
-                  </div>
-                  <div class="caption">
-                      <h3>A hoy hoy</h3>
+      {% endif %}
 
-                      <p>infoz</p>
-                  </div>
-
-              </div>
-          </div>
-      </div>
-
-
-  </div>
-
+</form>
 </div>
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="bootstrap/js/jquery-1.11.3.min.js"></script>
+    <script src="../static/bootstrap/js/jquery-1.11.3.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="bootstrap/js/bootstrap.min.js"></script>
+    <script src="../static/bootstrap/js/bootstrap.min.js"></script>
     <script>
-    $("#editButton").on("click", function(){
-        var column_items = $("div[class^='col-']");
-        for(var i=0; i < column_items.length; i++){
-            var item = column_items[i];
-
-        }
-    })
-
+    $("#save_link").on("click", function(event){
+        event.preventDefault();
+        $("#save_form").submit();
+    });
     </script>
 
   </body>

@@ -37,6 +37,11 @@ hr {
   padding-bottom: 0px;
 }
 
+.non_editable_column {
+  padding-top:23px;
+  padding-bottom: 21px;
+}
+
 body { padding-top: 70px; }
 
 input[type=text]

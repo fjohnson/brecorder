@@ -25,8 +25,8 @@
 
   <nav class="navbar-fixed-top">
       <ul class="nav nav-tabs">
-          <li role="presentation" class="active"><a href="#">Home</a></li>
-          <li role="presentation"><a href="#" id="editButton">Edit</a></li>
+          <li role="presentation" class="active"><a href="/">Home</a></li>
+          <li role="presentation"><a href="/edit/{{ beer.id}}" id="editButton">Edit</a></li>
           <li role="presentation"><a href="#">Messages</a></li>
       </ul>
   </nav>
@@ -50,7 +50,6 @@
       </div>
 
       <div class="data row">
-          <form role="form">
 
           <div class="col-md-1">{{ beer.name }}</div>
           <div class="col-md-1"><h6>{{ beer.style }}</h6></div>
@@ -64,7 +63,7 @@
           <div class="col-md-1">{{ beer.yeast }}</div>
           <div class="col-md-1">{{ beer.batch_size }}</div>
           <div class="col-md-1">{{ beer.date.strftime("%x") }}</div>
-</form>
+
       </div>
 
       <div class="header row">
@@ -178,7 +177,7 @@
           <div class="col-md-12">Videos</div>
       </div>
 
-      {% if beer.videos %}
+      {% if not beer.videos %}
 
           <div class="row">
           {% for video in beer.videos %}

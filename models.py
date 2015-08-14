@@ -6,6 +6,7 @@ from sqlalchemy.orm import relationship
 Base = declarative_base()
 
 class Hops(Base):
+
     __tablename__ = 'hops'
     id = Column(Integer, Sequence('hops_id_seq'), primary_key=True)
     record_id = Column(Integer, ForeignKey('beer.id'))
@@ -14,6 +15,13 @@ class Hops(Base):
     time = Column(Integer)
     type_enums = Enum("Boil", "Dryhop", "FWH", "Flame Out")
     type = Column(type_enums)
+
+    def __init__(self, name, oz, time, type):
+        super(Hops, self).__init__()
+        self.name = name
+        self.oz = oz
+        self.time = time
+        self.type = type
 
     def __repr__(self):
         return str((self.id, self.record_id, self.name, self.oz))
@@ -26,12 +34,25 @@ class Fermentable(Base):
     lbs = Column(Float)
     note = Column(String, nullable=True)
 
+    def __init__(self, name, lbs, note=''):
+        super(Fermentable, self).__init__()
+        self.name = name
+        self.lbs = lbs
+        if note is None:
+            note = ''
+        self.note = note
+
 class Note(Base):
     __tablename__ = 'note'
     id = Column(Integer, Sequence('note_id_seq'), primary_key=True)
     record_id = Column(Integer, ForeignKey('beer.id'))
     text = Column(Text, nullable=False)
     date = Column(DateTime)
+
+    def __init__(self, text, date):
+        super(Note, self).__init__()
+        self.text = text
+        self.date = date
 
 class OtherIngredient(Base):
     __tablename__ = 'otheringredient'
@@ -40,6 +61,14 @@ class OtherIngredient(Base):
     name = Column(String)
     amount = Column(String)
     note = Column(Text)
+
+    def __init__(self, name, amount, note):
+        super(OtherIngredient, self).__init__()
+        self.name = name
+        self.amount = amount
+        if note is None:
+            note = ''
+        self.note = note
 
 class ImagesBeer(Base):
     __tablename__ = 'imagesbeer'

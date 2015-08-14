@@ -3,11 +3,12 @@ from database import engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from models import *
 from werkzeug.utils import redirect
+import pprint
 
 session = scoped_session(sessionmaker(bind=engine, autocommit=False, autoflush=False))
 Base.metadata.create_all(engine)
 
-from flask import Flask, url_for, render_template
+from flask import Flask, url_for, render_template, request
 
 app = Flask(__name__)
 
@@ -17,10 +18,6 @@ def shutdown_session(exception=None):
 
 @app.route('/')
 def index():
-    return redirect(url_for('test'))
-
-@app.route('/test')
-def test():
 
     br = BeerRecord(
         name = "Hogworts",
@@ -73,9 +70,10 @@ def test():
     br.images = images
     br.videos = videos
 
-    session.add(br)
-    session.commit()
-    return redirect('record/1')
+    if not session.query(BeerRecord).filter_by(id=1).first():
+        session.add(br)
+        session.commit()
+    return display_record(1)
 
 def compile_fermentables(fermentables):
     total_weight = 0.0
@@ -93,14 +91,72 @@ def compile_fermentables(fermentables):
     fermentable_data['items'] = sorted(fermentable_data['items'], reverse=True)
 
     return fermentable_data
+
 @app.route('/record/<id>')
 def display_record(id):
+
     beer_record = session.query(BeerRecord).filter_by(id=id).first()
 
     if beer_record:
         fermentable_data = compile_fermentables(beer_record.fermentables)
         return render_template('beer.html', beer=beer_record, fermentables=fermentable_data)
     return internal_server_error(beer_record)
+
+def update_record(beer, changes):
+    hops = changes.poplist('hop')
+    fermentables = changes.poplist('fermentable')
+    other_ingredients = changes.poplist('oingredient')
+    notes = changes.poplist('notes')
+
+    new_hops = []
+    print hops
+    for i in range(0, len(hops), 4):
+        new_hops.append(Hops(*hops[i:i+4]))
+    beer.hops = new_hops
+
+    new_fermentables = []
+    for i in range(0, len(fermentables), 3):
+        new_fermentables.append(Fermentable(*fermentables[i:i+3]))
+    beer.fermentables = new_fermentables
+
+    new_oingredients = []
+    for i in range(0, len(other_ingredients), 3):
+        new_oingredients.append(OtherIngredient(*other_ingredients[i:i+3]))
+    beer.other_ingredients = new_oingredients
+
+    new_notes = []
+    for i in range(0, len(notes), 2):
+
+        text = notes[i]
+        if not text:
+            continue
+        date = datetime.datetime.strptime(notes[i+1], '%x')
+        new_notes.append(Note(text, date))
+    beer.notes = new_notes
+
+    for change in changes:
+        if change == 'date':
+            date = datetime.datetime.strptime(changes[change], "%x")
+            beer.date = date
+        else:
+            setattr(beer, change, changes[change])
+
+
+@app.route('/edit/<id>', methods=['POST', 'GET'])
+def edit_record(id):
+
+    beer_record = session.query(BeerRecord).filter_by(id=id).first()
+
+    if not beer_record:
+        return internal_server_error(beer_record)
+
+    if request.method == 'POST':
+        update_record(beer_record, request.form.copy())
+        session.commit()
+
+    fermentable_data = compile_fermentables(beer_record.fermentables)
+    return render_template('beer_edit.html', beer=beer_record, fermentables=fermentable_data)
+
 
 @app.errorhandler(500)
 def internal_server_error(e):
