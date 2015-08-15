@@ -102,7 +102,7 @@
 
 
 
-      <div class="header row">
+      <div class="header row fermentable_header">
           <div class="col-md-4">Fermentables</div>
           <div class="col-md-2">Lbs ({{ fermentables['total'] }} lbs)</div>
           <div class="col-md-2">Percent</div>
@@ -111,17 +111,29 @@
 
       {% for fermentable in fermentables['items'] %}
 
-          <div class="data row">
+          <div class="data row fermentables">
               <div class="col-md-4"><input type="text" class="form-control" name="fermentable" value="{{ fermentable[1].name }}"></div>
               <div class="col-md-2"><input type="text" class="form-control" name="fermentable" value="{{ fermentable[1].lbs }}"></div>
               <div class="col-md-2 non_editable_column">{{ fermentable[0] }}</div>
-              <div class="col-md-4"><input type="text" class="form-control" name="fermentable" value="{{ fermentable[1].note }}"></div>
+              <div class="col-md-4 form-inline">
+                  <input type="text" class="form-control" name="fermentable" value="{{ fermentable[1].note }}">
+                  <button type="button" class="btn btn-default btn-xs">
+                    <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+                  </button>
+              </div>
           </div>
 
       {% endfor %}
 
+      <div class="row">
+          <div class="col-md-2 buttongroup">
+              <button id="addfermentable" type="button" class="btn btn-default btn-sm">
+                  <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+              </button>
+          </div>
+      </div>
 
-      <div class="header row">
+      <div class="header row" id="oingredients_header">
           <div class="col-md-4">Other Ingredient</div>
           <div class="col-md-4">Amount</div>
           <div class="col-md-4">Note</div>
@@ -129,40 +141,53 @@
 
       {% for other_ingredient in beer.other_ingredients %}
 
-          <div class="data row">
+          <div class="data row oingredients">
               <div class="col-md-4"><input type="text" class="form-control" name="oingredient" value="{{ other_ingredient.name }}"></div>
               <div class="col-md-4"><input type="text" class="form-control" name="oingredient" value="{{ other_ingredient.amount }}"></div>
-              <div class="col-md-4"><input type="text" class="form-control" name="oingredient" value="{{ other_ingredient.note }}"></div>
+              <div class="col-md-4 form-inline">
+                  <input type="text" class="form-control" name="oingredient" value="{{ other_ingredient.note }}">
+                  <button type="button" class="btn btn-default btn-xs">
+                      <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+                  </button>
+              </div>
           </div>
 
       {% endfor %}
 
       <div class="row">
-          <div class="col-md-1">
-              <button type="button" class="btn btn-default btn-lg">
+          <div class="col-md-2 buttongroup">
+              <button id="addoingredient" type="button" class="btn btn-default btn-sm">
                   <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-              </button>
-          </div>
-          <div class="col-md-1">
-              <button type="button" class="btn btn-default btn-lg">
-                  <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
               </button>
           </div>
       </div>
 
-      <div class="header row">
+      <div class="header row" id="notes_header">
           <div class="col-md-8">Notes</div>
           <div class="col-md-4">Date</div>
       </div>
 
       {% for note in beer.notes|sort(attribute='date') %}
 
-          <div class="data row">
+          <div class="data row notes">
               <div class="col-md-8"><textarea name="notes" rows="5" class="form-control">{{ note.text }}</textarea></div>
-              <div class="col-md-4"><input type="text" class="form-control" name="notes" value="{{ note.date.strftime('%x') }}"></div>
+              <div class="col-md-4 form-inline ">
+                  <input class="form-control" type="text" name="notes" value="{{ note.date.strftime('%x') }}">
+                  <button type="button" class="btn btn-default btn-xs">
+                      <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+                  </button>
+              </div>
           </div>
 
       {% endfor %}
+
+      <div class="row">
+          <div class="col-md-2 buttongroup">
+              <button id="addnote" type="button" class="btn btn-default btn-sm">
+                  <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+              </button>
+          </div>
+      </div>
 
       <!-- Images -->
       <div class="header row">
@@ -221,12 +246,7 @@
     <script src="../static/bootstrap/js/jquery-1.11.3.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="../static/bootstrap/js/bootstrap.min.js"></script>
-    <script>
-    $("#save_link").on("click", function(event){
-        event.preventDefault();
-        $("#save_form").submit();
-    });
-    </script>
+    <script src="../static/actions.js"></script>
 
   </body>
 </html>

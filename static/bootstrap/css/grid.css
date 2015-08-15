@@ -20,6 +20,10 @@ hr {
   margin-bottom: 40px;
 }
 
+.buttongroup {
+  border: 0px;
+  right: 15px;
+}
 .header {
   margin-top: 20px;
 }
@@ -42,6 +46,9 @@ hr {
   padding-bottom: 21px;
 }
 
+.form-inline .form-control {
+  width: 90%
+}
 body { padding-top: 70px; }
 
 input[type=text]
