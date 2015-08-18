@@ -1,20 +1,43 @@
 import datetime
 from database import engine
+from flask.helpers import make_response
 from sqlalchemy.orm import sessionmaker, scoped_session
 from models import *
 from werkzeug.utils import redirect
 import pprint
-
+import os
+from werkzeug import secure_filename
+import urllib
 session = scoped_session(sessionmaker(bind=engine, autocommit=False, autoflush=False))
 Base.metadata.create_all(engine)
 
 from flask import Flask, url_for, render_template, request
 
 app = Flask(__name__)
+UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'static', 'media')
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif', 'mp4'])
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 @app.teardown_appcontext
 def shutdown_session(exception=None):
     session.remove()
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    file = request.files['file']
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        #return redirect('static/media/{}'.format(urllib.quote(filename)))
+        response = make_response('../static/media/{}'.format(urllib.quote(filename)))
+        response.headers['Content-Type'] = 'text/plain'
+        return response
+    return internal_server_error()
 
 @app.route('/')
 def index():
@@ -159,7 +182,7 @@ def edit_record(id):
 
 
 @app.errorhandler(500)
-def internal_server_error(e):
+def internal_server_error(e=None):
     return render_template('500.html'), 500
 if __name__ == '__main__':
     app.run(debug=True)

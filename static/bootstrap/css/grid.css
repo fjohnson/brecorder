@@ -46,6 +46,11 @@ hr {
   padding-bottom: 21px;
 }
 
+.non_editable_column_hops {
+  padding-top:21px;
+  padding-bottom: 21px;
+}
+
 .form-inline .form-control {
   width: 90%
 }

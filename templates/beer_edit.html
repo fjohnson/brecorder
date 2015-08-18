@@ -26,7 +26,7 @@
   <nav class="navbar-fixed-top">
       <ul class="nav nav-tabs">
           <li role="presentation"><a href="/">Home</a></li>
-          <li role="presentation" class="active"><a href="" id="save_link">Save</a></li>
+          <li role="button" class="active"><a href="" id="save_link">Save</a></li>
           <li role="presentation"><a href="#">Messages</a></li>
       </ul>
   </nav>
@@ -77,7 +77,7 @@
           <div class="col-md-1 temperature"><h6><input type="text" class="form-control" name="fermentation_temperature" value="{{ beer.fermentation_temperature }}"></h6></div>
       </div>
 
-      <div class="header row">
+      <div class="header row" id="hops_header">
           <div class="col-md-3">Hops</div>
           <div class="col-md-3">Oz</div>
           <div class="col-md-3">Time</div>
@@ -85,21 +85,31 @@
       </div>
 
       {% for hop in beer.hops|sort(attribute='time') %}
-          <div class="data row">
+          <div class="data row hops">
               <div class="col-md-3"><input type="text" class="form-control" name="hop" value="{{ hop.name }}"></div>
               <div class="col-md-3"><input type="text" class="form-control" name="hop" value="{{ hop.oz }}"></div>
               <div class="col-md-3"><input type="text" class="form-control" name="hop" value="{{ hop.time }}"></div>
-              <div class="col-md-3 non_editable_column">
+              <div class="col-md-3 non_editable_column_hops">
                   <select form="save_form" name="hop">
                       <option value="Boil" {% if hop.type == 'Boil' %} selected {% endif %}>Boil</option>
                       <option value="Dryhop" {% if hop.type == 'Dryhop' %} selected {% endif %}>Dryhop</option>
                       <option value="FWH" {% if hop.type == 'FWH' %} selected {% endif %}>FWH</option>
                       <option value="Flame Out" {% if hop.type == 'Flame Out' %} selected {% endif %}>Flame Out</option>
                   </select>
+                  <button type="button" class="btn btn-default btn-xs">
+                    <span class="glyphicon glyphicon-minus row-remove" aria-hidden="true"></span>
+                  </button>
               </div>
           </div>
       {% endfor %}
 
+      <div class="row">
+          <div class="col-md-2 buttongroup">
+              <button id="addhop" type="button" class="btn btn-default btn-sm">
+                  <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+              </button>
+          </div>
+      </div>
 
 
       <div class="header row fermentable_header">
@@ -118,7 +128,7 @@
               <div class="col-md-4 form-inline">
                   <input type="text" class="form-control" name="fermentable" value="{{ fermentable[1].note }}">
                   <button type="button" class="btn btn-default btn-xs">
-                    <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+                    <span class="glyphicon glyphicon-minus row-remove" aria-hidden="true"></span>
                   </button>
               </div>
           </div>
@@ -147,7 +157,7 @@
               <div class="col-md-4 form-inline">
                   <input type="text" class="form-control" name="oingredient" value="{{ other_ingredient.note }}">
                   <button type="button" class="btn btn-default btn-xs">
-                      <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+                      <span class="glyphicon glyphicon-minus row-remove" aria-hidden="true"></span>
                   </button>
               </div>
           </div>
@@ -174,7 +184,7 @@
               <div class="col-md-4 form-inline ">
                   <input class="form-control" type="text" name="notes" value="{{ note.date.strftime('%x') }}">
                   <button type="button" class="btn btn-default btn-xs">
-                      <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+                      <span class="glyphicon glyphicon-minus row-remove" aria-hidden="true"></span>
                   </button>
               </div>
           </div>
@@ -190,29 +200,41 @@
       </div>
 
       <!-- Images -->
-      <div class="header row">
+      <div class="header row" id="images_header">
           <div class="col-md-12">Images</div>
       </div>
 
-      {% if beer.images %}
-          <div class="row">
-          {% for image in beer.images %}
 
-                  <div class="col-md-2">
-                      <div class="thumbnail">
-                          <a href="{{ image.path }}">
-                              <img src="{{ image.path }}">
-                          </a>
+      <div class="row images">
+      {% for image in beer.images %}
+          <div class="col-md-2">
+              <div class="thumbnail">
+                  <a href="{{ image.path }}">
+                      <img src="{{ image.path }}">
+                  </a>
 
-                          <div class="caption">
-                              <p>{{ image.note }}</p>
-                          </div>
-                      </div>
+                  <div class="caption">
+                      <p>{{ image.note }}</p>
                   </div>
-          {% endfor %}
+                  <div class="col-md-2 buttongroup">
+                      <button type="button" class="btn btn-default btn-xs">
+                          <span class="glyphicon glyphicon-minus img-remove" aria-hidden="true"></span>
+                      </button>
+                  </div>
+              </div>
           </div>
-      {% endif %}
+      {% endfor %}
+      </div>
 
+
+      <div class="row">
+          <div class="col-md-2 buttongroup">
+              <input type="file" id="fileElem" multiple accept="image/*" style="display:none" onchange="file_upload(this.files[0])">
+              <button type="button" class="btn btn-default btn-sm" id="fileSelect">
+                  <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+              </button>
+          </div>
+      </div>
 
       <!-- Video -->
       <div class="header row">
